@@ -1,40 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import { FormLabel, Switch, Input} from '@material-ui/core';
+import { FormLabel, FormControl, Switch, Input, InputLabel} from '@material-ui/core';
 import {Slider} from '@material-ui/lab';
 import withRoot from '../../withRoot';
 
 const styles = theme => ({
     root: {
-      width: '100%'
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent:'center',      
+      width: '100%'      
     },
     formControl: {
       // margin: theme.spacing.unit * 3,
-      display: 'flex',
-      width: '100%',
-      // border: '1px solid black',
+      display: 'flex',      
+      justifyContent: 'center',      
       flexWrap: 'nowrap',
-      marginBottom: 10
-    },
-   
-    label: {
-      width: '30%',
-      // border: '1px solid red',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      textAlign: 'left',
-      marginRight: 20,
-      marginBottom: 10
-    },
-    switch: {
-        
-    },
+      margin: theme.spacing.unit      
+    },   
+    label: {      
+      position:'relative',
+      top: 10
+    },    
     slider: {
         width: 200,
-        paddingTop: 20,
-        // border: '1px solid red',
+        paddingTop: 20,        
         marginLeft: 20
     }
   });
@@ -94,23 +85,32 @@ const styles = theme => ({
     renderField = type => fieldObj =>  {
       
       return (
-        (!fieldObj.showIf || this.arePrerequisitesTrue(fieldObj.showIf)) && <div className={this.props.classes.formControl} key={fieldObj.backEndName}>           
-          <FormLabel className={this.props.classes.label} required>
+        (!fieldObj.showIf || this.arePrerequisitesTrue(fieldObj.showIf)) && 
+          <div className={this.props.classes.formControl} key={fieldObj.backEndName}>           
+          {/* <FormLabel className={this.props.classes.label} required>
             {fieldObj.uiName}
-          </FormLabel>
+          </FormLabel> */}
           {
-              type === 'bool' && <Switch
-                      className={this.props.classes.switch}
-                      checked={this.state[fieldObj.backEndName]}
-                      onChange={this.handleSwitchChange(fieldObj.backEndName)}
-                      value={fieldObj.backEndName}
-                      color="primary"
-                  />
+              type === 'bool' && (
+              <>
+              <FormControl>
+               <InputLabel className={this.props.classes.label} shrink>{fieldObj.uiName}</InputLabel> 
+              <Switch
+                className={this.props.classes.switch}
+                checked={this.state[fieldObj.backEndName]}
+                onChange={this.handleSwitchChange(fieldObj.backEndName)}
+                value={fieldObj.backEndName}
+                color="primary"
+              />
+              </FormControl>
+              </>)
           }
           {
               type === 'num' && 
               (
                   <>
+                   <FormControl>
+                      <InputLabel className={this.props.classes.label} shrink>{fieldObj.uiName}</InputLabel> 
                       <Slider 
                               className={this.props.classes.slider}
                               value={this.state[fieldObj.backEndName]}        
@@ -119,6 +119,7 @@ const styles = theme => ({
                               min={0}                        
                       />
                       <Input readOnly value={this.state[fieldObj.backEndName]} disableUnderline/>
+                    </FormControl>
                   </>
               )                
           }
