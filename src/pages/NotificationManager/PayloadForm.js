@@ -2,41 +2,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import { FormLabel, FormControlLabel, Input, Radio, RadioGroup, Button} from '@material-ui/core';
+import { FormLabel, FormControlLabel, Input, Radio, RadioGroup, Button, TextField} from '@material-ui/core';
 import { getDocument, getDocuments } from '../../services/firestore';
 import withRoot from '../../withRoot';
 import Dropdown from '../../common/Dropdown';
 
 const styles = theme => ({
     root: {
-      width: '100%'
+      width: '100%'      
     },
-    formControl: {
-      // margin: theme.spacing.unit * 3,
+    formControlType: {      
+      display: 'flex',
+      width: '100%',      
+      flexWrap: 'nowrap',
+      marginBottom: 10,
+      justifyContent: 'center'
+    },
+    formControlField: {
       display: 'flex',
       width: '100%',
-      // border: '1px solid black',
-      flexWrap: 'nowrap',
-      marginBottom: 10
+      justifyContent: 'center'
     },
     group: {
       margin: `${theme.spacing.unit}px 0`,
       width: '30%',
-      display: 'flex',
-      // border: '1px solid black',
+      display: 'flex',      
       flexDirection: 'row'
-    },
-    label: {
-      width: '30%',
-      // border: '1px solid red',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      textAlign: 'left',
-      marginRight: 20,
-      marginBottom: 10
-    },
-
+    },    
+    textField: {      
+      width: 400,
+      marginBottom: 10      
+    }
   });
 
 
@@ -264,22 +260,27 @@ const styles = theme => ({
       // console.log(`value in ${backEndName} field is: `, this.state[`${backEndName}Value`])
       // const preserveValue = !fillAfter || this.state[`${fillAfter}Value`];
       return (
-        <div className={this.props.classes.formControl} key={backEndName}>           
-          <FormLabel className={this.props.classes.label} required>
-            {uiName}
-          </FormLabel>
-          {inputType === 'text' && (<Input 
-            onChange={this.handleInput(backEndName)}
-            disabled={shouldBeDisabled}
-            value={ this.state[`${backEndName}Value`] }
-          />)}
+        <div className={this.props.classes.formControlField} key={backEndName}>          
+          
+          {inputType === 'text' && (
+            <TextField 
+              required
+              variant='outlined'
+              id={backEndName}
+              label={uiName} 
+              disabled={shouldBeDisabled} 
+              className={this.props.classes.textField} 
+              value={ this.state[`${backEndName}Value`]} onChange={this.handleInput(backEndName)}/>
+         
+          )}
           {
             inputType === 'dropdown' && (
                 <Dropdown 
                   menuList={this.state[textFieldObj.dataKey]} 
                   handleSelection={this.handleSelection(backEndName)}
                   disabled={shouldBeDisabled}
-                  deselect={backEndName === 'videoId' ? !this.state[`${backEndName}Value`]: false}                   
+                  deselect={backEndName === 'videoId' ? !this.state[`${backEndName}Value`]: false}
+                  prompt={uiName}                   
                   />
             )
           }
@@ -295,10 +296,7 @@ const styles = theme => ({
 
         return (
             <div className={classes.root}>
-              <div className={classes.formControl} >           
-                <FormLabel className={classes.label} required>
-                    Type
-                </FormLabel>
+              <div className={classes.formControlType} >                           
                 <RadioGroup
                     aria-label="type"
                     name="video"

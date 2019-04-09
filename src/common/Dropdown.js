@@ -22,7 +22,7 @@ class Dropdown extends React.Component {
 
   render() {
     const { anchorEl } = this.state;
-    const { menuList, disabled, deselect } = this.props;
+    const { menuList, disabled, deselect, prompt } = this.props;
     if (disabled) this.selection = '';
     
     return (
@@ -33,7 +33,7 @@ class Dropdown extends React.Component {
           onClick={this.handleClick}
           disabled={disabled}
         >
-          {deselect ? 'Select' : (this.selection || 'Select')}
+          {deselect ? `Select ${prompt}` : (this.selection || `Select ${prompt}`)}
         </Button>
         <Menu
           id="simple-menu"
