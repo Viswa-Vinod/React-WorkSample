@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 // import Button from '@material-ui/core/Button';
 // import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import { CircularProgress, Modal, Typography } from '@material-ui/core';
 
 import withRoot from '../../withRoot';
 import AppLayout from '../../common/AppLayout';
@@ -20,8 +21,19 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 5,
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center'
-  }
+    alignItems: 'center'    
+  },
+  loader: {    
+    marginLeft: '50%'
+  },
+  modal: {
+    position: 'absolute',
+    width: theme.spacing.unit * 50,
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing.unit * 4,
+    outline: 'none',
+  },
 });
 
 const panelStyles = {
@@ -29,24 +41,30 @@ const panelStyles = {
   marginBottom: 20
 } 
 
-const sideBarItems = ['Push Notifications', 'Video Uploads', 'Analytics']
 
-// const validateUserEntries = ( payload, userParams ) => {
-//   let valid = true, msg='';
-//   const { timeElapsedMin, timeElapsedMax} = userParams;
-//   const { title, body } = payload;
 
-//   if (timeElapsedMax <= timeElapsedMin) { 
-//     valid = false;
-//     msg = 'Time Elapsed Min should be greater than Time Elasped Max';
-//   } 
+function getModalStyle() {
+  const top = 50;
+  const left = 50;;
 
-// }
+  return {
+    top: `${top}%`,
+    left: `${left}%`,
+    transform: `translate(-${top}%, -${left}%)`,
+  };
+}
+
+
+const sideBarItems = ['Push Notifications', 'Video Uploads', 'Analytics'];
+const NOTIFICATION_CLOUD_FUNCTION = '';
+
+
 class NotificationManager extends React.Component {
   
   state = {
     validPayload: false,
-    validUserParams: false
+    validUserParams: false,
+    sendingNotification: false
   }
 
   payload = { 
@@ -83,11 +101,23 @@ class NotificationManager extends React.Component {
 
   handleClick = async (actionType) => {
     if (actionType === 'send') {
-      // validateUserEntries(this.payload,this.userParams);
+      this.setState({ sendingNotification: true });
       try {
-        console.log('sending data to DB', {payload: this.payload, userParams: this.userParams})
+        console.log('sending data to DB', {payload: this.payload, userParams: this.userParams});
+        // setTimeout(()=>this.setState({ sendingNotification: false }), 3000);
         await setOne('Notification', 'Payload', this.payload);
         await setOne('Notification', 'userParameters', this.userParams);
+        fetch(NOTIFICATION_CLOUD_FUNCTION)
+          .then(response => response.json())
+          .then(data => {
+                console.log({data});
+                this.setState({ sendingNotification: false });
+          })
+          .catch(err=>{
+            console.log({err});
+            this.setState({ sendingNotification: false });
+          });
+
       } catch (Error) {
         console.log({Error})
       }
@@ -95,19 +125,36 @@ class NotificationManager extends React.Component {
   }
 
   handleValidity = type => validityStatus => {    
-    // console.log({type, validityStatus})
+    console.log({type, validityStatus})
     this.setState({[type]: validityStatus})
   }
 
   render() {
     const { classes } = this.props;
-    const { validPayload, validUserParams } = this.state;
-
+    const { validPayload, validUserParams, sendingNotification } = this.state;
+    
     return (
       
       <AppLayout title='Push Notification Manager' sideBarItems={sideBarItems}>
-      <div className={classes.root}>
-        <Panel title='Payload' styling={panelStyles}>
+      <div className={classes.root} >
+        <Modal
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
+          open={sendingNotification}
+          onClose={()=>{}}
+        >
+          <div style={getModalStyle()} className={classes.modal}>
+            <Typography variant="h6" id="modal-title">
+              Sending Notification
+            </Typography>
+            <CircularProgress className={classes.loader}/>
+            <Typography variant="subtitle1" id="simple-modal-description">
+              Please wait while notification is being sent
+            </Typography>
+            
+          </div>
+        </Modal>
+        <Panel title='Payload' styling={panelStyles} >
           <PayloadForm 
               handleInput={this.handlePayloadInput} 
               validity={this.handleValidity('validPayload')}
@@ -122,7 +169,7 @@ class NotificationManager extends React.Component {
         <Panel title='Actions' styling={panelStyles} >
           <NotificationActions 
               handleClick={this.handleClick} 
-              validForm={validPayload && validUserParams} />
+              validForm={validPayload && validUserParams && !sendingNotification} />
         </Panel>       
       </div>
       </AppLayout>
