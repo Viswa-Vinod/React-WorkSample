@@ -1,0 +1,323 @@
+
+import React from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import { FormLabel, FormControlLabel, Input, Radio, RadioGroup, Button} from '@material-ui/core';
+import { getDocument, getDocuments } from '../../services/firestore';
+import withRoot from '../../withRoot';
+import Dropdown from '../../common/Dropdown';
+
+const styles = theme => ({
+    root: {
+      width: '100%'
+    },
+    formControl: {
+      // margin: theme.spacing.unit * 3,
+      display: 'flex',
+      width: '100%',
+      // border: '1px solid black',
+      flexWrap: 'nowrap',
+      marginBottom: 10
+    },
+    group: {
+      margin: `${theme.spacing.unit}px 0`,
+      width: '30%',
+      display: 'flex',
+      // border: '1px solid black',
+      flexDirection: 'row'
+    },
+    label: {
+      width: '30%',
+      // border: '1px solid red',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      textAlign: 'left',
+      marginRight: 20,
+      marginBottom: 10
+    },
+
+  });
+
+
+
+  function isUrlValid(userInput) {
+    var res = userInput.match(/(https?:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/g);
+    if(res == null)
+        return false;
+    else
+        return true;
+  }
+
+  class PayloadForm extends React.Component {
+    isValidPayload = false
+
+    state = {
+      type: 'video',
+      videoCategories:[],
+      videoLinks:[],
+      selectedVideoLink: {show: false, value: ''},      
+      titleValue:'',
+      bodyValue:'',
+      imageValue:'',
+      videoCategoryValue: '',
+      videoIdValue: '',
+      webUrlValue:'',
+      updatedByValidityCheck: false      
+    }
+
+    textFields = {
+                  'video' : [
+                              {uiName: 'Title', backEndName: 'title', fillAfter: '', inputType: 'text'}, 
+                              {uiName: 'Body', backEndName: 'body', fillAfter: 'title', inputType: 'text'},
+                              {uiName: 'Image Url', backEndName: 'image', fillAfter: 'body', inputType: 'text'},
+                              {uiName: 'Video Category', backEndName: 'videoCategory', fillAfter: 'image', inputType: 'dropdown', dataKey: 'videoCategories'},
+                              {uiName: 'Video Link', backEndName: 'videoId', fillAfter: 'videoCategory', inputType: 'dropdown', dataKey: 'videoLinks'}
+                            ],
+                  'url'   : [ 
+                              {uiName: 'Title', backEndName: 'title', fillAfter: '', inputType: 'text'}, 
+                              {uiName: 'Body', backEndName: 'body', fillAfter: 'title', inputType: 'text'},
+                              {uiName: 'Web Url', backEndName: 'webUrl', fillAfter: 'body', inputType: 'text'}
+                            ]
+                }
+
+    async componentDidMount() {
+      try {
+        // get homelayout document from firestore
+        const homeLayoutDocument = await getDocument('layouts', 'home');
+        // extract the categories from the document
+        const { categories } = homeLayoutDocument.data();
+        
+        this.categories = categories;
+        // console.log({categories});
+        const categoriesArr = categories.map(cat => cat.name);
+                                        
+        // storing home screen data to ensure it's available later
+        this.setState({videoCategories: categoriesArr});
+      } catch (Error) {
+        // console.error('An error occurred while getting home screen categories');
+        // console.error('Error is ', Error);
+        console.log({Error})
+      }
+    }              
+    componentDidUpdate() {
+      
+      const { type, videoCategoryValue, videoIdValue } = this.state;
+      const isValidVideoCategoryValue = (videoCategoryValue !== '') && (videoCategoryValue !== 'Select');
+      const isValidVideoIdValue = (videoIdValue !== '') && (videoIdValue !== 'Select');
+
+      if (!this.state.updatedByValidityCheck) {
+
+        if (this.state.titleValue.length === 0) {
+          return this.setState({
+            bodyValue:'',
+            imageValue:'',
+            videoCategoryValue: '',
+            videoIdValue: '',
+            ...(type === 'url' ? {webUrlValue: ''} : {}),
+            updatedByValidityCheck: true
+          })
+        };
+        if (this.state.bodyValue.length === 0) {
+          return this.setState({          
+            imageValue:'',
+            videoCategoryValue: '',
+            videoIdValue: '',
+            ...(type === 'url' ? {webUrlValue: ''} : {}),
+            updatedByValidityCheck: true
+          })
+        }
+        if (this.state.imageValue.length === 0 && type === 'video') {
+          return this.setState({                    
+            videoCategoryValue: '',
+            videoIdValue: '',            
+            updatedByValidityCheck: true
+          })
+        }
+        if (!isValidVideoCategoryValue  && type === 'video') {
+          return this.setState({                              
+            videoIdValue: '',
+            updatedByValidityCheck: true
+          })
+        }
+      }
+      
+      if (type === 'video') {
+        const areUrlsValid = isUrlValid(this.state.imageValue);
+        // console.log({areUrlsValid});
+        // const isVideoInCategory = this.categories
+        if ( 
+              this.state.titleValue.length > 0 && 
+              this.state.bodyValue.length > 0 &&
+              this.state.imageValue.length > 0 &&
+              isValidVideoCategoryValue && 
+              isValidVideoIdValue  && 
+              areUrlsValid ) {
+                !this.isValidPayload && this.props.validity(true);
+                this.isValidPayload = true;                
+          }        
+        else {
+          this.isValidPayload && this.props.validity(false);
+          this.isValidPayload = false;
+        }
+      }
+
+      if (type === 'url') {
+        const isWebUrlValid = isUrlValid(this.state.webUrlValue);
+        if ( 
+          this.state.titleValue.length > 0 && 
+          this.state.bodyValue.length > 0 &&
+          this.state.webUrlValue.length > 0 && isWebUrlValid
+           ) {
+            !this.isValidPayload &&  this.props.validity(true);
+            this.isValidPayload = true;
+        }        
+        else {          
+          this.isValidPayload && this.props.validity(false);
+          this.isValidPayload = false;
+        }
+      }
+    }
+
+    handleTypeChange = ({target: {value}}) => {
+      this.props.handleInput('type', value);
+      this.setState(prevState => ({
+                ...prevState, 
+                type: value, 
+                updatedByValidityCheck: false,
+                selectedVideoLink:{show:false, value:''},
+                titleValue:'',
+                bodyValue:'',
+                imageValue:'',
+                videoCategoryValue: '',
+                videoIdValue: '',
+                webUrlValue:'',                
+      }));
+    }
+
+    handleInput = name => ({target: {value}}) => {
+      this.props.handleInput(name, value);      
+      this.setState({ [`${name}Value`]: value, updatedByValidityCheck: false })      
+    }
+
+    handleSelection = type => selection => {
+      // console.log({selection});
+      if (selection && selection !== 'Select') {
+        (type === 'videoCategory') && this.getVideos(selection);
+        // console.log({selection});
+        const reducedSelection = (type === 'videoId') 
+                                  ? this.videoEntries[selection].id 
+                                  : selection;
+        this.props.handleInput(type, reducedSelection);
+        this.setState(prevState => ({...prevState,
+                [`${type}Value`]: reducedSelection, 
+                updatedByValidityCheck: false,
+                ...(type === 'videoCategory' ?  {selectedVideoLink:{show: false, value: ''}, videoIdValue:''} : {}),
+                ...(type === 'videoId' ? {selectedVideoLink:{show: true, value: reducedSelection}} : {}),                
+              }))
+      }
+
+      //edge case: category deselected after video link is selected
+      if (type === 'videoCategory' && !selection) {
+        this.setState(prevState => ({
+          ...prevState, 
+          selectedVideoLink:{show: false, value: ''},
+          videoCategoryValue: '',
+          videoIdValue: ''
+        }))
+      }
+    }
+
+    getVideos = async (category) => {     
+      
+      try {
+        // creating the filter to get videos        
+        const metadataFilter = [];        
+        if (category && category !== 'any') {
+          const categories = category
+            .split(',')
+            .map((value) => value.toLowerCase());
+          metadataFilter.push(...categories);
+        }
+  
+        const videoEntries = await getDocuments('videos', {
+          metadata: {
+            op: 'array-contains',
+            value: metadataFilter.join('_')
+          }
+        });
+  
+        if (Object.keys(videoEntries).length === 0) {
+          throw new Error('unable to retrieve videos');
+        }
+        this.videoEntries = videoEntries;
+        this.setState({videoLinks : Object.keys(videoEntries)});
+        
+      } catch (error) {
+        console.log({error})
+      }
+    };
+
+    renderTextField = textFieldObj =>  {
+      const { backEndName, uiName, fillAfter, inputType } = textFieldObj;
+      const shouldBeDisabled = Boolean(fillAfter) && !this.state[`${fillAfter}Value`].length;
+      // console.log(`value in ${backEndName} field is: `, this.state[`${backEndName}Value`])
+      // const preserveValue = !fillAfter || this.state[`${fillAfter}Value`];
+      return (
+        <div className={this.props.classes.formControl} key={backEndName}>           
+          <FormLabel className={this.props.classes.label} required>
+            {uiName}
+          </FormLabel>
+          {inputType === 'text' && (<Input 
+            onChange={this.handleInput(backEndName)}
+            disabled={shouldBeDisabled}
+            value={ this.state[`${backEndName}Value`] }
+          />)}
+          {
+            inputType === 'dropdown' && (
+                <Dropdown 
+                  menuList={this.state[textFieldObj.dataKey]} 
+                  handleSelection={this.handleSelection(backEndName)}
+                  disabled={shouldBeDisabled}
+                  deselect={backEndName === 'videoId' ? !this.state[`${backEndName}Value`]: false}                   
+                  />
+            )
+          }
+        </div>
+      )
+    }
+    
+
+    render() {
+        
+        const { classes } = this.props;
+        const { type } = this.state;
+
+        return (
+            <div className={classes.root}>
+              <div className={classes.formControl} >           
+                <FormLabel className={classes.label} required>
+                    Type
+                </FormLabel>
+                <RadioGroup
+                    aria-label="type"
+                    name="video"
+                    className={classes.group}
+                    value={type}
+                    onChange={this.handleTypeChange}
+                    
+                >
+                    <FormControlLabel value="video" control={<Radio />} label="Video" />
+                    <FormControlLabel value="url" control={<Radio />} label="Url" />                    
+                </RadioGroup>              
+              </div>
+              { this.textFields[type].map(this.renderTextField) }
+              {this.state.selectedVideoLink.show && <Button variant="contained" href={this.state.selectedVideoLink.value} target="_blank" className={classes.button}>
+                  Video Link
+                  </Button> }
+            </div>
+        )
+    }
+  }
+
+  export default withRoot(withStyles(styles)(PayloadForm));
