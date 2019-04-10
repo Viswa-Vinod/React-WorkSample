@@ -56,7 +56,7 @@ function getModalStyle() {
 
 
 const sideBarItems = ['Push Notifications', 'Video Uploads', 'Analytics'];
-const NOTIFICATION_CLOUD_FUNCTION = '';
+const NOTIFICATION_CLOUD_FUNCTION = 'https://us-central1-testapp-6ab58.cloudfunctions.net/sendNotificationLastSeen';
 
 
 class NotificationManager extends React.Component {
