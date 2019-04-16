@@ -1,48 +1,66 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+import { Button, TextField } from '@material-ui/core';
 
 import withRoot from '../../withRoot';
 
 const styles = theme => ({
-  root: {
-    width: '100%',
+  root: {    
     display: 'flex',
-    justifyContent: 'space-evenly'
-  },
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%'
+  },  
   button: {
     margin: theme.spacing.unit,
+    width: 200
   },
   input: {
     display: 'none',
   },
+  schedule: {
+    display: 'flex',
+    justifyContent: 'flex-end'    
+  }
 });
 
+const getCurrentDate = () => {
+  const now = new Date();
+  return `${now.toLocaleDateString()}T${now.getHours()}:${now.getMinutes()}`
+}
+
+
 function NotificationActions(props) {
-  const { classes, handleClick, validForm } = props;
+  const { classes, handleClick, validForm, handleSchedule } = props;
   // console.log({validForm})
   return (
-    <div className={classes.root}>
-     
+    <div className={classes.root}>       
       <Button 
         variant="contained" 
         color="primary" 
         className={classes.button} 
         disabled={!validForm} 
-        onClick={() => handleClick('send')}
+        onClick={ handleClick('send')}
+        size="small"
       >
         Send Notification
-      </Button>
-      <Button 
-        variant="outlined" 
-        color="secondary" 
-        className={classes.button} 
-        disabled onClick={()=>handleClick('schedule')}
-      >
-        Schedule Notification
-      </Button>      
-    </div>
+      </Button>        
+      <TextField
+        id="datetime-local"
+        label="Schedule Notification"
+        type="datetime-local"
+        disabled={!validForm}
+        defaultValue={getCurrentDate()}
+        onChange={handleSchedule}
+        className={classes.textField}
+        InputLabelProps={{
+          shrink: true,
+        }}      
+      />     
+      </div>
+    
   );
 }
 

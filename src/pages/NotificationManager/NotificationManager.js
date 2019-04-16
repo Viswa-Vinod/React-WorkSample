@@ -67,6 +67,7 @@ class NotificationManager extends React.Component {
     sendingNotification: false
   }
 
+  schedule = {DateTime: 'now'}
   payload = { 
               appState: 'background', 
               type: 'video', 
@@ -75,7 +76,8 @@ class NotificationManager extends React.Component {
               webUrl: '', 
               videoId: '', 
               videoCategory:'', 
-              image:'' 
+              image:'',
+              schedule: 'now' 
             };
 
   userParams = { 
@@ -91,7 +93,7 @@ class NotificationManager extends React.Component {
 
   handlePayloadInput = (name, value) => {
     this.payload[name] = value; 
-    //console.log({payload: this.payload})   
+    // console.log({payload: this.payload})   
   }
 
   handleUserParamInput = (name, value) => {
@@ -99,33 +101,38 @@ class NotificationManager extends React.Component {
     // console.log({userParams: this.userParams})
   }
 
-  handleClick = async (actionType) => {
-    if (actionType === 'send') {
+  handleSchedule = (event) => {
+    //TODO: validation - confirm that scheduled time is ahead of current time
+   this.payload['schedule'] = event.target.value;
+  }
+
+  handleClick =  (actionType) => async () => {  
       this.setState({ sendingNotification: true });
+
       try {
         console.log('sending data to DB', {payload: this.payload, userParams: this.userParams});
         // setTimeout(()=>this.setState({ sendingNotification: false }), 3000);
-        await setOne('Notification', 'Payload', this.payload);
-        await setOne('Notification', 'userParameters', this.userParams);
-        fetch(NOTIFICATION_CLOUD_FUNCTION)
-          .then(response => response.json())
-          .then(data => {
-                console.log({data});
-                this.setState({ sendingNotification: false });
-          })
-          .catch(err=>{
-            console.log({err});
-            this.setState({ sendingNotification: false });
-          });
-
+        // await setOne('Notification', 'Payload', this.payload);
+        // await setOne('Notification', 'userParameters', this.userParams);        
+        
+        //   fetch(NOTIFICATION_CLOUD_FUNCTION)
+        //     .then(response => response.json())
+        //     .then(data => {
+        //           console.log({data});
+        //           this.setState({ sendingNotification: false });
+        //     })
+        //     .catch(err=>{
+        //       console.log({err});
+        //       this.setState({ sendingNotification: false });
+        //     });
+        
       } catch (Error) {
         console.log({Error})
       }
-    }
   }
 
   handleValidity = type => validityStatus => {    
-    console.log({type, validityStatus})
+    // console.log({type, validityStatus})
     this.setState({[type]: validityStatus})
   }
 
@@ -169,7 +176,10 @@ class NotificationManager extends React.Component {
         <Panel title='Actions' styling={panelStyles} >
           <NotificationActions 
               handleClick={this.handleClick} 
-              validForm={validPayload && validUserParams && !sendingNotification} />
+              validForm={validPayload && validUserParams && !sendingNotification} 
+              handleSchedule={this.handleSchedule}    
+          />
+              
         </Panel>       
       </div>
       </AppLayout>
