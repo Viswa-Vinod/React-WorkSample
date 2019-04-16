@@ -103,6 +103,7 @@ class NotificationManager extends React.Component {
 
   handleSchedule = (event) => {
     //TODO: validation - confirm that scheduled time is ahead of current time
+    // console.log(event.target.value)
    this.payload['schedule'] = event.target.value;
   }
 
@@ -111,20 +112,20 @@ class NotificationManager extends React.Component {
 
       try {
         console.log('sending data to DB', {payload: this.payload, userParams: this.userParams});
-        // setTimeout(()=>this.setState({ sendingNotification: false }), 3000);
-        // await setOne('Notification', 'Payload', this.payload);
-        // await setOne('Notification', 'userParameters', this.userParams);        
+        setTimeout(()=>this.setState({ sendingNotification: false }), 3000);
+        await setOne('Notification', 'Payload', this.payload);
+        await setOne('Notification', 'userParameters', this.userParams);        
         
-        //   fetch(NOTIFICATION_CLOUD_FUNCTION)
-        //     .then(response => response.json())
-        //     .then(data => {
-        //           console.log({data});
-        //           this.setState({ sendingNotification: false });
-        //     })
-        //     .catch(err=>{
-        //       console.log({err});
-        //       this.setState({ sendingNotification: false });
-        //     });
+          fetch(NOTIFICATION_CLOUD_FUNCTION)
+            .then(response => response.json())
+            .then(data => {
+                  console.log({data});
+                  this.setState({ sendingNotification: false });
+            })
+            .catch(err=>{
+              console.log({err});
+              this.setState({ sendingNotification: false });
+            });
         
       } catch (Error) {
         console.log({Error})
