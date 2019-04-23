@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Button, TextField } from '@material-ui/core';
 
-import withRoot from '../../withRoot';
+import withRoot from 'withRoot';
 
 const styles = theme => ({
   root: {    

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { FormLabel, FormControl, Switch, Input, InputLabel} from '@material-ui/core';
 import {Slider} from '@material-ui/lab';
-import withRoot from '../../withRoot';
+import withRoot from 'withRoot';
 
 const styles = theme => ({
     root: {

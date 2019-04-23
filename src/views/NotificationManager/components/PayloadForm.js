@@ -2,10 +2,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import { FormLabel, FormControlLabel, Input, Radio, RadioGroup, Button, TextField} from '@material-ui/core';
-import { getDocument, getDocuments } from '../../services/firestore';
-import withRoot from '../../withRoot';
-import Dropdown from '../../common/Dropdown';
+import { FormControlLabel, Radio, RadioGroup, Button, TextField} from '@material-ui/core';
+import { getDocument, getDocuments } from 'services/firestore';
+import withRoot from 'withRoot';
+import Dropdown from 'components/Dropdown';
 
 const styles = theme => ({
     root: {

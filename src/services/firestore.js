@@ -1,16 +1,9 @@
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 
-const config = {
-    apiKey: "AIzaSyDHW9dNluVmRMn9fvtiz4l34ZBbDWsOuBg",
-    authDomain: "testapp-6ab58.firebaseapp.com",
-    databaseURL: "https://testapp-6ab58.firebaseio.com",
-    projectId: "testapp-6ab58",
-    storageBucket: "testapp-6ab58.appspot.com",
-    messagingSenderId: "498353385934"
-  };
+import { firestoreConfig } from 'app/config';
   
-firebase.initializeApp(config);
+firebase.initializeApp(firestoreConfig);
 const db = firebase.firestore();
 
 export async function getDocument(collection, key) {

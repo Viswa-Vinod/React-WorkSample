@@ -5,15 +5,15 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { CircularProgress, Modal, Typography } from '@material-ui/core';
 
-import withRoot from '../../withRoot';
-import AppLayout from '../../common/AppLayout';
-import Panel from '../../common/Panel';
+import withRoot from 'withRoot';
+import AppLayout from 'components/AppLayout';
+import Panel from 'components/Panel';
 
-import PayloadForm from './PayloadForm';
-import UsersForm from './UsersForm';
-import NotificationActions from './NotificationActions';
+import PayloadForm from './components/PayloadForm';
+import UsersForm from './components/UsersForm';
+import NotificationActions from './components/NotificationActions';
 
-import { setOne } from '../../services/firestore';
+import { setOne } from 'services/firestore';
 
 const styles = theme => ({
   root: {
