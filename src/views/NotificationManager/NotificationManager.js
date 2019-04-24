@@ -6,7 +6,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { CircularProgress, Modal, Typography } from '@material-ui/core';
 
 import withRoot from 'withRoot';
-import AppLayout from 'components/AppLayout';
+
 import Panel from 'components/Panel';
 
 import PayloadForm from './components/PayloadForm';
@@ -14,6 +14,9 @@ import UsersForm from './components/UsersForm';
 import NotificationActions from './components/NotificationActions';
 
 import { setOne } from 'services/firestore';
+
+import { NOTIFICATION_CLOUD_FUNCTION } from 'app/config';
+
 
 const styles = theme => ({
   root: {
@@ -54,9 +57,6 @@ function getModalStyle() {
   };
 }
 
-
-const sideBarItems = ['Push Notifications', 'Video Uploads', 'Analytics'];
-const NOTIFICATION_CLOUD_FUNCTION = 'https://us-central1-testapp-6ab58.cloudfunctions.net/sendNotificationLastSeen';
 
 
 class NotificationManager extends React.Component {
@@ -143,7 +143,7 @@ class NotificationManager extends React.Component {
     
     return (
       
-      <AppLayout title='Push Notification Manager' sideBarItems={sideBarItems}>
+      
       <div className={classes.root} >
         <Modal
           aria-labelledby="simple-modal-title"
@@ -183,7 +183,7 @@ class NotificationManager extends React.Component {
               
         </Panel>       
       </div>
-      </AppLayout>
+      
     );
   }
 }

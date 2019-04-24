@@ -6,3 +6,6 @@ export const firestoreConfig = {
     storageBucket: "testapp-6ab58.appspot.com",
     messagingSenderId: "498353385934"
   };
+
+
+export const NOTIFICATION_CLOUD_FUNCTION = 'https://us-central1-testapp-6ab58.cloudfunctions.net/sendNotificationLastSeen';

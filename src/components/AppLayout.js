@@ -1,26 +1,34 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
+import { 
+        Drawer, 
+        CssBaseline, 
+        AppBar,
+        Collapse, 
+        Toolbar, 
+        List, 
+        Typography, 
+        Divider, 
+        IconButton, 
+        Menu, 
+        ListItem, 
+        ListItemText } from '@material-ui/core';
+import withRoot from 'withRoot';
 import MenuIcon from '@material-ui/icons/Menu';
+import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import withRoot from 'withRoot';
+
+import Links from 'utils/links';
+
 
 const drawerWidth = 240;
 
 const styles = theme => ({
-  root: {
+  appBarRoot: {
     display: 'flex',
   },
   appBar: {
@@ -36,6 +44,17 @@ const styles = theme => ({
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
+  },
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start'
+  },
+  compoundMenu: {
+    borderColor: 'red',
+    // display: 'flex',
+    // flexDirection: 'column',
+    // alignItems: 'flex-start'
   },
   menuButton: {
     marginLeft: 12,
@@ -67,6 +86,11 @@ const styles = theme => ({
     }),
     marginLeft: -drawerWidth,
   },
+  nested: {
+    paddingLeft: theme.spacing.unit * 4,
+    borderColor: 'red',
+    borderWidth: 1
+  },
   contentShift: {
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.easeOut,
@@ -79,6 +103,8 @@ const styles = theme => ({
 class PersistentDrawerLeft extends React.Component {
   state = {
     open: false,
+    submenuOpen: false,
+    title:'Push Notification Manager'
   };
 
   handleDrawerOpen = () => {
@@ -89,12 +115,21 @@ class PersistentDrawerLeft extends React.Component {
     this.setState({ open: false });
   };
 
+  toggleSubmenu = menu => () => {
+    console.log({menu})
+    this.setState((prevState) => ({ submenuOpen:!prevState.submenuOpen, title: menu }))
+  }
+
+  handleClick = (menu) => () => {
+    console.log({menu})
+    this.setState({ title: menu})
+  }
   render() {
-    const { classes, theme, children, title, sideBarItems } = this.props;
-    const { open } = this.state;
+    const { classes, theme, children, sideBarItems } = this.props;
+    const { open, submenuOpen, title } = this.state;
 
     return (
-      <div className={classes.root}>
+      <div className={classes.appBarRoot}>
         <CssBaseline />
         <AppBar
           position="fixed"
@@ -111,9 +146,11 @@ class PersistentDrawerLeft extends React.Component {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" color="inherit" noWrap>
-              {title}
-            </Typography>
+             
+                <Typography variant="h6" color="inherit" noWrap>
+                    {title}
+                </Typography>
+             
           </Toolbar>
         </AppBar>
         <Drawer
@@ -132,12 +169,44 @@ class PersistentDrawerLeft extends React.Component {
           </div>
           <Divider />
           <List>
-            {sideBarItems.map((text) => (
-              <ListItem button key={text}>
-                {/* <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon> */}
-                <ListItemText primary={text}/>
-              </ListItem>
-            ))}
+            {sideBarItems.map((item) =>  {
+             
+             if (typeof item === 'string') 
+              return (
+                <ListItem button onClick={this.handleClick(item)} key={item}>
+                  <Link to={Links.computeLinkString(item)}>
+                      <ListItemText primary={item}/>
+                  </Link>
+                </ListItem>
+              )
+              if (typeof item === 'object') {
+                for ( let key in item) {                  
+                  const subMenus = item[key];
+                    return (
+                      [
+                      <ListItem button key={key} onClick={this.toggleSubmenu(key)} className={classes.compoundMenu}>
+                        <Link to={Links.computeLinkString(key)}> 
+                        <ListItemText primary={key} />
+                        </Link>
+                        {submenuOpen ? <ExpandLess /> : <ExpandMore />}
+                      </ListItem>,
+                        <Collapse key='collapse' in={submenuOpen} timeout="auto" unmountOnExit>
+                        <List key='submenus' component='div'  disablePadding>
+                        {subMenus.map(subMenu => (
+                          <ListItem button key={subMenu} className={classes.nested} onClick={this.handleClick(subMenu)}>
+                            <Link to={Links.computeLinkObject({ menu: key, subMenu})}>
+                              <ListItemText inset primary={subMenu}/>
+                            </Link>
+                          </ListItem>                          
+                        ))}
+                        </List>                       
+                        </Collapse>
+                      ]
+                    )
+                  }                
+              }
+            })
+            }
           </List>          
         </Drawer>
         <main
