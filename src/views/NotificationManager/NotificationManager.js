@@ -113,7 +113,6 @@ class NotificationManager extends React.Component {
       this.setState({ sendingNotification: true });
 
       try {
-        console.log('sending data to DB', {payload: this.payload, userParams: this.userParams});
         // setTimeout(()=>this.setState({ sendingNotification: false }), 3000);
         await firestore.setOne('Notification', 'Payload', this.payload);
         await firestore.setOne('Notification', 'userParameters', this.userParams);        
@@ -121,11 +120,9 @@ class NotificationManager extends React.Component {
           fetch(NOTIFICATION_CLOUD_FUNCTION)
             .then(response => response.json())
             .then(data => {
-                  console.log({data});
                   this.setState({ sendingNotification: false });
             })
             .catch(err=>{
-              console.log({err});
               this.setState({ sendingNotification: false });
             });
         

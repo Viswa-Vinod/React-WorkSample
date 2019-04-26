@@ -17,7 +17,7 @@ class FirebaseManager {
     }
 
     initializeApp(configurations) {
-        console.log('initializing app',configurations);
+        // console.log('initializing app',configurations);
         try {
             configurations.forEach(({appName, configuration}) => {
                 if (!this.apps[ appName ]) {

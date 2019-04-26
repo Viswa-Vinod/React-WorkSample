@@ -97,6 +97,9 @@ const styles = theme => ({
       duration: theme.transitions.duration.enteringScreen,
     }), 
     marginLeft: 0,
+  },
+  link: {
+    textDecoration: 'none'
   }
 });
 
@@ -178,7 +181,7 @@ class PersistentDrawerLeft extends React.Component {
              if (typeof item === 'string') 
               return (
                 <ListItem button onClick={this.handleClick(item)} key={item}>
-                  <Link to={Links.computeLinkString(item)}>
+                  <Link to={Links.computeLinkString(item)} className={classes.link}>
                       <ListItemText primary={item}/>
                   </Link>
                 </ListItem>
@@ -189,7 +192,7 @@ class PersistentDrawerLeft extends React.Component {
                     return (
                       [
                       <ListItem button key={key} onClick={this.toggleSubmenu(key)} className={classes.compoundMenu}>
-                        <Link to={Links.computeLinkString(key)}> 
+                        <Link to={Links.computeLinkString(key)} className={classes.link}> 
                         <ListItemText primary={key} />
                         </Link>
                         {submenuOpen ? <ExpandLess /> : <ExpandMore />}
@@ -198,7 +201,7 @@ class PersistentDrawerLeft extends React.Component {
                         <List key='submenus' component='div'  disablePadding>
                         {subMenus.map(subMenu => (
                           <ListItem button key={subMenu} className={classes.nested} onClick={this.handleClick(subMenu)}>
-                            <Link to={Links.computeLinkObject({ menu: key, subMenu})}>
+                            <Link to={Links.computeLinkObject({ menu: key, subMenu})} className={classes.link}>
                               <ListItemText inset primary={subMenu}/>
                             </Link>
                           </ListItem>                          

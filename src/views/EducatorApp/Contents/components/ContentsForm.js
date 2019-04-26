@@ -37,7 +37,6 @@ const styles = theme => ({
 });
 
 function ContentsForm({ classes, handleInput, videos, themes }) {
-  console.log({videos, themes})
     const [ thumbnailURL, setthumbnailURL ] = useState('');
     const [ videoURL, setVideoURL ] = useState('')
     const [ videoName, setVideoName ] = useState('');
@@ -50,7 +49,6 @@ function ContentsForm({ classes, handleInput, videos, themes }) {
     }
 
     const handleChange = type => event => {
-      console.log(event.target.value);
       switch (type) {
         case 'thumbnailURL':
           return setthumbnailURL(event.target.value);
@@ -72,10 +70,6 @@ function ContentsForm({ classes, handleInput, videos, themes }) {
           setVideoName(selectedVideo.name);
         }
         if (type === 'theme') {
-          console.log(event.target.value);
-          // const { options } = event.target;
-          // const theme=[];
-          // options.forEach(option => option.selected && theme.push(option.value))
           setTheme(event.target.value);
         }
     }

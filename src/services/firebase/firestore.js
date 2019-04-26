@@ -32,11 +32,9 @@ class Firestore {
 
     async getOne(collection, key) {
         try {
-            console.log({db: this.db})
             if (this.db) {
                 const collectionRef = this.db.collection(collection);
                 const snapshot = await collectionRef.doc(key).get();
-                console.log({data: snapshot.data()})
                 return snapshot.exists && snapshot.data()
                     ? snapshot.data()
                     : null;

@@ -6,6 +6,7 @@ import { FormControlLabel, Radio, RadioGroup, Button, TextField} from '@material
 import { Firestore } from 'services/firebase';
 import withRoot from 'withRoot';
 import Dropdown from 'components/Dropdown';
+import { isUrlValid } from 'utils/validations';
 
 const firestore = new Firestore();
 
@@ -39,13 +40,13 @@ const styles = theme => ({
 
 
 
-  function isUrlValid(userInput) {
-    var res = userInput.match(/(https?:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/g);
-    if(res == null)
-        return false;
-    else
-        return true;
-  }
+  // function isUrlValid(userInput) {
+  //   var res = userInput.match(/(https?:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/g);
+  //   if(res == null)
+  //       return false;
+  //   else
+  //       return true;
+  // }
 
   class PayloadForm extends React.Component {
     isValidPayload = false
@@ -83,12 +84,10 @@ const styles = theme => ({
       try {
         // get homelayout document from firestore
         const homeLayoutDocument = await firestore.getOne('layouts', 'home');
-        console.log({homeLayoutDocument});
         // extract the categories from the document
         const { categories } = homeLayoutDocument;
         
         this.categories = categories;
-        // console.log({categories});
         const categoriesArr = categories.map(cat => cat.name);
                                         
         // storing home screen data to ensure it's available later

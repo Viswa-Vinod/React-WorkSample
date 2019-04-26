@@ -6,7 +6,6 @@ const firestore = new Firestore();
 
 export async function getVideos(filters) {
     try {
-        console.log('In the get videos service');
         const videoEntries = await firestore
             .getMany(
                 VIDEOS_COLLECTION,
@@ -16,7 +15,6 @@ export async function getVideos(filters) {
                     }
                 }
             );
-        console.log('Successfully got videos');
         return videoEntries;
     } catch (Exception) {
         console.log('An error occurred while getting videos');
