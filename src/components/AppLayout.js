@@ -116,12 +116,12 @@ class PersistentDrawerLeft extends React.Component {
   };
 
   toggleSubmenu = menu => () => {
-    console.log({menu})
+    // console.log({menu})
     this.setState((prevState) => ({ submenuOpen:!prevState.submenuOpen, title: menu }))
   }
 
   handleClick = (menu) => () => {
-    console.log({menu})
+    // console.log({menu})
     this.setState({ title: menu})
   }
   render() {

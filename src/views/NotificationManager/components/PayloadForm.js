@@ -3,9 +3,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { FormControlLabel, Radio, RadioGroup, Button, TextField} from '@material-ui/core';
-import { getDocument, getDocuments } from 'services/firestore';
+import { Firestore } from 'services/firebase';
 import withRoot from 'withRoot';
 import Dropdown from 'components/Dropdown';
+
+const firestore = new Firestore();
 
 const styles = theme => ({
     root: {
@@ -80,9 +82,10 @@ const styles = theme => ({
     async componentDidMount() {
       try {
         // get homelayout document from firestore
-        const homeLayoutDocument = await getDocument('layouts', 'home');
+        const homeLayoutDocument = await firestore.getOne('layouts', 'home');
+        console.log({homeLayoutDocument});
         // extract the categories from the document
-        const { categories } = homeLayoutDocument.data();
+        const { categories } = homeLayoutDocument;
         
         this.categories = categories;
         // console.log({categories});
@@ -236,7 +239,7 @@ const styles = theme => ({
           metadataFilter.push(...categories);
         }
   
-        const videoEntries = await getDocuments('videos', {
+        const videoEntries = await firestore.getMany('videos', {
           metadata: {
             op: 'array-contains',
             value: metadataFilter.join('_')

@@ -13,9 +13,11 @@ import PayloadForm from './components/PayloadForm';
 import UsersForm from './components/UsersForm';
 import NotificationActions from './components/NotificationActions';
 
-import { setOne } from 'services/firestore';
+import { Firestore } from 'services/firebase';
 
 import { NOTIFICATION_CLOUD_FUNCTION } from 'app/config';
+
+const firestore = new Firestore();
 
 
 const styles = theme => ({
@@ -112,9 +114,9 @@ class NotificationManager extends React.Component {
 
       try {
         console.log('sending data to DB', {payload: this.payload, userParams: this.userParams});
-        setTimeout(()=>this.setState({ sendingNotification: false }), 3000);
-        await setOne('Notification', 'Payload', this.payload);
-        await setOne('Notification', 'userParameters', this.userParams);        
+        // setTimeout(()=>this.setState({ sendingNotification: false }), 3000);
+        await firestore.setOne('Notification', 'Payload', this.payload);
+        await firestore.setOne('Notification', 'userParameters', this.userParams);        
         
           fetch(NOTIFICATION_CLOUD_FUNCTION)
             .then(response => response.json())

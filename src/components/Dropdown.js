@@ -22,7 +22,7 @@ class Dropdown extends React.Component {
 
   render() {
     const { anchorEl } = this.state;
-    const { menuList, disabled, deselect, prompt } = this.props;
+    const { menuList, disabled, deselect, prompt, multiple = false } = this.props;
     if (disabled) this.selection = '';
     
     return (

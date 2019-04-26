@@ -6,8 +6,6 @@ import { SIDE_BAR_ITEMS } from 'app/constants';
 import NotificationManager from 'views/NotificationManager';
 import EducatorApp, { Contents, Themes, Schools } from 'views/EducatorApp';
 
-
-
 const App = (
     <Router>
         <AppLayout title='Push Notification Manager' sideBarItems={SIDE_BAR_ITEMS}>
