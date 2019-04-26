@@ -11,7 +11,7 @@ const App = (
         <AppLayout title='Push Notification Manager' sideBarItems={SIDE_BAR_ITEMS}>
             <Route path='/' exact component={NotificationManager} />
             <Route path='/push-notifications'  component={NotificationManager} />
-            {/* <Route path='/educator-app'  component={EducatorApp} />         */}
+            <Route path='/educator-app' exact component={Contents} />        
             <Route path='/educator-app/contents'  component={Contents} /> 
             <Route path='/educator-app/themes'  component={Themes} /> 
             <Route path='/educator-app/schools'  component={Schools} /> 

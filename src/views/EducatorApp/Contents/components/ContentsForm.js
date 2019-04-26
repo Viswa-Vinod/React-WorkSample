@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { TextField, InputLabel, Switch, Button } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import Dropdown from 'components/Dropdown';
+import SelectItem from 'components/SelectItem';
 import withRoot from 'withRoot';
 
 const styles = theme => ({
@@ -14,6 +14,9 @@ const styles = theme => ({
     button: {
       margin: theme.spacing.unit
     },  
+    selectFormControl: {
+      minWidth: 200
+    },
     formControl: {
         display: 'flex',
         width: '100%',
@@ -23,6 +26,10 @@ const styles = theme => ({
     label: {
         fontSize: 20
     },
+    selectArea: {
+      marginLeft: 20,
+      marginBottom: 20
+    },
     textField: {
         marginBottom: 20
     }        
@@ -30,10 +37,11 @@ const styles = theme => ({
 });
 
 function ContentsForm({ classes, handleInput, videos, themes }) {
+  console.log({videos, themes})
     const [ thumbnailURL, setthumbnailURL ] = useState('');
     const [ videoURL, setVideoURL ] = useState('')
     const [ videoName, setVideoName ] = useState('');
-    const [ theme, setTheme ] = useState('');
+    const [ theme, setTheme ] = useState([]);
     const [ hasLessonPlan, setHasLessonPlan ] = useState(false);
     const [ lessonplanURL, setlessonplanURL ] = useState('');
 
@@ -54,16 +62,21 @@ function ContentsForm({ classes, handleInput, videos, themes }) {
         break;
       }
     }
-    const handleSelection = (type) => (selection) => {
-        console.log(selection)
+    const handleSelection = (type) => (event) => {
+        
         if (type === 'video') {
+          const selection = event.target.value;
           const selectedVideo = videos.filter(video => video.name === selection)[0];
           setthumbnailURL(selectedVideo.thumbnailURL);
           setVideoURL(selectedVideo.videoURL);                
           setVideoName(selectedVideo.name);
         }
         if (type === 'theme') {
-          setTheme(selection);
+          console.log(event.target.value);
+          // const { options } = event.target;
+          // const theme=[];
+          // options.forEach(option => option.selected && theme.push(option.value))
+          setTheme(event.target.value);
         }
     }
 
@@ -73,20 +86,20 @@ function ContentsForm({ classes, handleInput, videos, themes }) {
     }
   return (
     <div className={classes.root}>
-        <Dropdown 
-                  menuList={videos.map(video => video.name)} 
-                  handleSelection={handleSelection('video')}
-                //   disabled={shouldBeDisabled}
-                //   deselect={backEndName === 'videoId' ? !this.state[`${backEndName}Value`]: false}
-                  prompt='Video'                   
-        />
-        <Dropdown 
-                  menuList={themes} 
-                  handleSelection={handleSelection('theme')}
-                //   disabled={shouldBeDisabled}
-                //   deselect={backEndName === 'videoId' ? !this.state[`${backEndName}Value`]: false}
-                  prompt='Theme'                   
-        />
+          <SelectItem 
+              prompt='Select Video'
+              onChange={handleSelection('video')}
+              items={videos.map(video => video.name)}
+              itemDefault={videoName}              
+          />
+          
+          <SelectItem 
+              prompt='Select Themes'
+              onChange={handleSelection('theme')}
+              items={themes}
+              itemDefault={theme}
+              multiple
+          />          
         <div className={classes.formControl}>
             <InputLabel className={classes.label} shrink>{'Has Lesson Plan ?'}</InputLabel> 
                 <Switch
@@ -96,8 +109,7 @@ function ContentsForm({ classes, handleInput, videos, themes }) {
                     value={hasLessonPlan}
                     color="primary"
             />
-        </div> 
-     
+        </div>      
         {hasLessonPlan && <TextField 
             required
             variant='outlined'

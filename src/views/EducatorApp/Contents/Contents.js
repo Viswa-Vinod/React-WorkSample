@@ -30,9 +30,9 @@ function Contents(props) {
    useEffect(() => {
     const getVideoObjects = async () => {
       const videosCollectionRef = await getVideos();
-      console.log({videosCollectionRef});
+      // console.log({videosCollectionRef});
       const themesRef = await getThemes();
-      console.log({themes: themesRef})
+      // console.log({themes: themesRef})
       setVideos(Object.values(videosCollectionRef)
                 .map(({id, name, thumbnailURL}) => ({videoURL: id, name, thumbnailURL })));
       setThemeNames(Object.values(themesRef).map(themeObj => themeObj.name))
@@ -41,6 +41,7 @@ function Contents(props) {
    }, [])
   const handleInput = field => () => {
     console.log(field);
+    
   }
 
 

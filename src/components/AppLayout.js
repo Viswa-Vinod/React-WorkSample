@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { 
         Drawer, 
@@ -107,6 +107,10 @@ class PersistentDrawerLeft extends React.Component {
     title:'Push Notification Manager'
   };
 
+  componentDidMount() {
+    const currentPath = this.props.location.pathname;
+    this.setState({ title: Links.computeTitle(currentPath)})
+  }
   handleDrawerOpen = () => {
     this.setState({ open: true });
   };
@@ -125,9 +129,9 @@ class PersistentDrawerLeft extends React.Component {
     this.setState({ title: menu})
   }
   render() {
-    const { classes, theme, children, sideBarItems } = this.props;
+    const { classes, theme, children, sideBarItems, location } = this.props;
     const { open, submenuOpen, title } = this.state;
-
+    
     return (
       <div className={classes.appBarRoot}>
         <CssBaseline />
@@ -222,4 +226,4 @@ class PersistentDrawerLeft extends React.Component {
   }
 }
 
-export default withRoot(withStyles(styles)(PersistentDrawerLeft));
+export default withRoot(withStyles(styles)(withRouter(PersistentDrawerLeft)));
