@@ -19,6 +19,7 @@ const styles = theme => ({
 function SelectItem(props) {
   const  { prompt, onChange, items, itemDefault, multiple = false, classes } = props;
   const [ item, setItem ] = useState(itemDefault);
+
   const handleChange = (event) => {
     setItem(event.target.value);
     onChange(event);

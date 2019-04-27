@@ -24,6 +24,9 @@ export default class Links {
         else {
             strAfterSlash = path;            
         }
+
+        console.log({strAfterSlash});
+        if (!strAfterSlash) return 'Push Notifications';
         title = strAfterSlash.replace("-", " ").split(" ")
                 .map(str => str[0].toUpperCase() + str.substring(1)).join(" ");
         return title 
