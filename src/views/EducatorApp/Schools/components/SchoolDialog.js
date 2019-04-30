@@ -14,8 +14,7 @@ export default function SchoolDialog(props) {
    const { 
        title, 
        prompt, 
-       handleTextInput, 
-       handleSelection, 
+       handleInput, 
        handleSubmit, 
        open, 
        handleCancel, 
@@ -41,32 +40,34 @@ export default function SchoolDialog(props) {
         label="Name"
         type="text"
         fullWidth
-        onChange={handleTextInput('name')}
-        value={selectedSchool.name}
+        onChange={handleInput('name')}
+        value={selectedSchool && selectedSchool.name || ''}
       />
        <TextField
         autoFocus
         margin="dense"
         id="url"
-        label="URL"
+        label="Logo URL"
         type="text"
         fullWidth
-        onChange={handleTextInput('url')}
+        onChange={handleInput('logoURL')}
+        value={selectedSchool && selectedSchool.logoURL || ''}
       />
-       <TextField
+       {/* <TextField
         autoFocus
         margin="dense"
         id="logo"
         label="logo"
         type="text"
         fullWidth
-        onChange={handleTextInput('logo')}
-      />
+        onChange={handleInput('logo')}
+        value={selectedSchool && selectedSchool.logoURL || ''}
+      /> */}
        <SelectItem 
         prompt='Select Themes'
-        onChange={handleSelection('theme')}
+        onChange={handleInput('themes')}
         items={themeNames}
-        itemDefault={selectedSchool.themes} 
+        itemDefault={selectedSchool && selectedSchool.themes || []} 
         multiple
     /> 
     </DialogContent>

@@ -15,17 +15,15 @@ export default class Links {
             path = path.substring(0, path.length-1);
         }
 
-        if (path[0] === '/') path = path.substring(1);
-
-        if(path.match(/[/]{1}/)) {
+        if (path.startsWith('/')) path = path.substring(1);
+        const hasSlashRegex = /[/]+/;
+        if(hasSlashRegex.test(path)) {
             const indexOfSecondSlash = path.indexOf('/');
             strAfterSlash = path.substring(indexOfSecondSlash + 1);            
         }        
         else {
             strAfterSlash = path;            
-        }
-
-        console.log({strAfterSlash});
+        }        
         if (!strAfterSlash) return 'Push Notifications';
         title = strAfterSlash.replace("-", " ").split(" ")
                 .map(str => str[0].toUpperCase() + str.substring(1)).join(" ");

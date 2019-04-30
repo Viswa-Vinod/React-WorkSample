@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import {
           Button,         
-          Modal,
           Paper, 
           Table, 
           TableBody, 
@@ -11,13 +10,14 @@ import {
           TableHead, 
           TableRow, 
           Switch,
-          TextField 
         } from '@material-ui/core';
 
-import SelectItem from 'components/SelectItem';
 import withRoot from 'withRoot';
-import { getThemes } from 'services/themes';
+import { getThemes, getSchools, updateSchool } from 'services';
 import SchoolDialog from './components/SchoolDialog';
+import uuid from 'uuid/v4';
+
+console.log(uuid());
 
 const styles = theme => ({
   container: {
@@ -43,6 +43,10 @@ const styles = theme => ({
   },
   header: {
     fontSize: 16
+  },
+  addschoolBtn: {
+    display: 'flex',
+    justifyContent:'center'
   }
 });
 
@@ -52,29 +56,45 @@ let id = 0;
 //   return { id, name, calories, fat, carbs, protein };
 // }
 
-const rows = [
-  { id: 1, name: 'School 1', isActive: true, themes: ['Fruits', 'Vegetables', 'Languages']},
-  { id: 2, name: 'School 2', isActive: false, themes: ['Fruits']},
-  { id: 3, name: 'School 3', isActive: true, themes: ['Fruits']},
-  { id: 4, name: 'School 4', isActive: true, themes: ['Fruits']},
-  { id: 5, name: 'School 5', isActive: false, themes: ['Fruits', 'Vegetables', 'Colors']}
-];
 
-function SimpleTable(props) {
+
+function SchoolList(props) {
   const [ schools, setSchools ] = useState([]);
   const [ open, setOpen ] = useState(false);
   const [ selectedSchool, setSelectedSchool ] = useState({});
   const [ themeNames, setThemeNames ] = useState([]);
-  const [ theme, setTheme ] = useState([]);
-
+  const [ themes, setThemes ] = useState({});
+  const [ saveData, setSaveData ] = useState(false);
+  const [ schoolEdited, setSchoolEdited] = useState('');
+  const [ addingSchool, setAddingSchool ] = useState(false);
+  
   useEffect(() => {
-    const getThemeNames = async () => {
+    const getThemesAndSchools = async () => {
       const themesRef = await getThemes();
+      setThemes(themesRef)
       setThemeNames(Object.values(themesRef).map(themeObj => themeObj.name))
-      setSchools(rows)
+      const schoolsRef = await getSchools();
+      setSchools(Object.entries(schoolsRef).map(schoolObj => ({
+        id: schoolObj[0], 
+        name: schoolObj[1].name,
+        isActive: schoolObj[1].isActive,
+        logoURL: schoolObj[1].logoURL,
+        themes: schoolObj[1].themes.map(theme => themesRef[theme].name)
+      })))
     } 
-    getThemeNames();
-  }, [])
+    getThemesAndSchools();
+  }, []);
+   
+  
+  
+  useEffect(() => {    
+    console.log('in effect 2', { schoolEdited, schools });
+    const selectedSchool = schools.filter(school => school.id === schoolEdited)[0];  
+    if ( selectedSchool && themes && schoolEdited && saveData ) {                
+      updateSchool(selectedSchool, themes);
+      saveData && setSaveData(false);      
+    }
+  }, [ schoolEdited, saveData ]);
   
   const handleSwitchChange = id => (event) => {
     setSchools(schools.map(school => {
@@ -82,8 +102,10 @@ function SimpleTable(props) {
         return { ...school, isActive: event.target.checked }
       }
       return school;
-    }));    
-    
+    })); 
+    // setSelectedSchool(schools.filter(school => school.id === id)[0])
+    setSchoolEdited(id);
+    setSaveData(true);
   }
 
   const handleClick = id => () => {
@@ -91,15 +113,26 @@ function SimpleTable(props) {
     setOpen(true);
   }
 
-  const handleChange = (id, field) => (event) => {
-    // setSchools(schools.map(school => school.id === id ? {...school, [field]: event.target.value} : school))
-    // setSelectedSchool(schools.filter(school => school.id === id)[0]);
-        
-  }
 
-  const handleSubmit = (event) => {    
-    setOpen(false);
-    setSchools(schools.map(school => school.id === selectedSchool.id ? selectedSchool : school))
+  const handleSubmit = (type) => () => {    
+    console.log({type});
+    if (type === 'Edit') {      
+      setOpen(false);    
+      setSchools(schools.map(school => school.id === selectedSchool.id 
+                              ? selectedSchool  : school));    
+      setSchoolEdited(selectedSchool.id); 
+      setSaveData(true);   
+    }
+
+    if (type === 'Add') {
+      setAddingSchool(false);
+      setOpen(false);   
+      const newSchool = { ...selectedSchool, id: uuid(), isActive: true}
+      console.log({ newSchool });
+      setSchoolEdited(newSchool.id);
+      setSchools([...schools, newSchool]);
+      setSaveData(true);
+    }
   }
 
   const handleCancel = () => {
@@ -107,25 +140,23 @@ function SimpleTable(props) {
   }
 
   const handleInput = (type) => event => {
-    console.log({...selectedSchool, [type]: event.target.value})
     setSelectedSchool({...selectedSchool, [type]: event.target.value})
   }
-
-  const handleSelection = (type) => (event) => {        
-    if (type === 'theme') {
-      setTheme(event.target.value);
-    }
-}
+  
   const { classes } = props;
 
+  const handleAddSchool = () => {
+    setSelectedSchool({});
+    setAddingSchool(true)
+    setOpen(true);
+  }
   return (
     <div className={classes.container}>    
     <SchoolDialog 
-      title='Edit School'
-      prompt='Edit School Details'
-      handleTextInput={handleInput}
-      handleSelection={handleSelection}
-      handleSubmit={handleSubmit}
+      title={ `${!addingSchool ? 'Edit ' : 'Add '} School` }
+      prompt={ `${!addingSchool ? 'Edit ' : 'Add '} School Details` }
+      handleInput={handleInput}
+      handleSubmit={handleSubmit(!addingSchool ? 'Edit' : 'Add')}
       open={open} 
       handleCancel={handleCancel} 
       selectedSchool={selectedSchool}
@@ -156,17 +187,21 @@ function SimpleTable(props) {
               </TableCell>              
             </TableRow>
           ))}
+          
         </TableBody>
       </Table>
+      <div className={classes.addschoolBtn}>
+        <Button onClick={handleAddSchool} color='primary'>Add School</Button>
+      </div>
     </Paper>
     </div>
 
   );
 }
 
-SimpleTable.propTypes = {
+SchoolList.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withRoot(withStyles(styles)(SimpleTable));
+export default withRoot(withStyles(styles)(SchoolList));
 
